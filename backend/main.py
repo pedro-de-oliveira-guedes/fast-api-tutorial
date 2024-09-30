@@ -25,6 +25,10 @@ async def get_all_tasks():
 async def get_task_by_id(id: int):
     return id
 
+@app.get("/api/tasks/{name}")
+async def get_task_by_name(name: str):
+    return name
+
 @app.post("/api/tasks")
 async def create_task():
     return 1
