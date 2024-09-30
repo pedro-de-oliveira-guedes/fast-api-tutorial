@@ -3,49 +3,51 @@ from model import Task
 # MongoDB Driver
 import motor.motor_asyncio
 
-client = motor.motor_asyncio.AsyncIOMotorClient('mongodb://localhost:27017')
+class Database:
+    def __init__(self):
+        self.client = motor.motor_asyncio.AsyncIOMotorClient('mongodb://localhost:27017')
 
-database = client.TodoList
-collection = database.tasks
+        self.database = self.client.TodoList
+        self.collection = self.database.tasks
 
-async def fetch_all_tasks():
-    tasks = []
+    async def fetch_all_tasks(self, ):
+        tasks = []
 
-    async for task in collection.find():
-        tasks.append(Task(**task))
+        async for task in self.collection.find():
+            tasks.append(Task(**task))
 
-    return tasks
+        return tasks
 
-async def fetch_one_task(id):
-    task = await collection.find_one({"id": id})
+    async def fetch_one_task(self, id):
+        task = await self.collection.find_one({"id": id})
 
-    return Task(**task)
+        return Task(**task)
 
-async def fetch_one_by_name(name):
-    query = {
-        "name": {
-            "$regex": f"{name}",
-            "$options": "i"
+    async def fetch_one_by_name(self, name):
+        query = {
+            "name": {
+                "$regex": f"{name}",
+                "$options": "i"
+            }
         }
-    }
 
-    tasks = []
-    async for task in collection.find(query):
-        tasks.append(Task(**task))
-    
-    return tasks
+        tasks = []
+        async for task in self.collection.find(query):
+            tasks.append(Task(**task))
+        
+        return tasks
 
-async def create_task(task: Task):
-    result = await collection.insert_one(task)
+    async def create_task(self, task: Task):
+        result = await self.collection.insert_one(task)
 
-    return result
+        return result
 
-async def update_task(id, task: Task):
-    result = await collection.replace_one({"id": id}, task)
+    async def update_task(self, id, task: Task):
+        result = await self.collection.replace_one({"id": id}, task)
 
-    return result
+        return result
 
-async def delete_task(id):
-    result = await collection.delete_one({"id": id})
+    async def delete_task(self, id):
+        result = await self.collection.delete_one({"id": id})
 
-    return result
+        return result
