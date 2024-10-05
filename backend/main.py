@@ -1,7 +1,8 @@
 from database import Database
-from model import TaskGet, TaskPost
+from model import TaskGet, TaskPost, TaskCreateResponse
 
-from fastapi import FastAPI, Response, HTTPException
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -46,14 +47,14 @@ async def get_task_by_name(name: str):
 
     return tasks
 
-@app.post("/api/tasks/", response_model=TaskPost)
+@app.post("/api/tasks/", response_model=TaskCreateResponse)
 async def create_task(task: TaskPost):
-    res = await MongoDB.create_task(task)
+    task_id = await MongoDB.create_task(task)
 
-    if res is None:
+    if task_id is None:
         raise HTTPException(status_code=500, detail="Failed to create task '{task}'")
 
-    return Response(status_code=201, content=res.__str__())
+    return JSONResponse(status_code=201, content={"id": str(task_id)})
 
 @app.put("/api/tasks/{id}/", response_model=TaskPost)
 async def update_task(id: int, task: TaskPost):
@@ -71,4 +72,4 @@ async def delete_task(id: int):
     if res is None:
         raise HTTPException(status_code=500, detail="Failed to delete task with id '{id}'")
     
-    return Response(status_code=204)
+    return JSONResponse(status_code=204)
