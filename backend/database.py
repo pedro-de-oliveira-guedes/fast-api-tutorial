@@ -1,4 +1,4 @@
-from model import Task
+from model import TaskGet, TaskPost
 
 # MongoDB Driver
 import motor.motor_asyncio
@@ -14,16 +14,16 @@ class Database:
         tasks = []
 
         async for task in self.collection.find():
-            tasks.append(Task(**task))
+            tasks.append(TaskGet(**task))
 
         return tasks
 
     async def fetch_one_task(self, id):
         task = await self.collection.find_one({"id": id})
 
-        return Task(**task)
+        return TaskGet(**task)
 
-    async def fetch_one_by_name(self, name):
+    async def fetch_by_name(self, name):
         query = {
             "name": {
                 "$regex": f"{name}",
@@ -33,16 +33,16 @@ class Database:
 
         tasks = []
         async for task in self.collection.find(query):
-            tasks.append(Task(**task))
+            tasks.append(TaskGet(**task))
         
         return tasks
 
-    async def create_task(self, task: Task):
-        result = await self.collection.insert_one(task)
+    async def create_task(self, task: TaskPost):
+        result = await self.collection.insert_one(task.model_dump())
 
         return result
 
-    async def update_task(self, id, task: Task):
+    async def update_task(self, id, task: TaskPost):
         result = await self.collection.replace_one({"id": id}, task)
 
         return result
