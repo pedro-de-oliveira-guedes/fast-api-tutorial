@@ -37,10 +37,10 @@ class Database:
         
         return tasks
 
-    async def create_task(self, task: TaskPost):
+    async def create_task(self, task: TaskPost) -> str:
         result = await self.collection.insert_one(task.model_dump())
 
-        return result
+        return result.inserted_id
 
     async def update_task(self, id, task: TaskPost):
         result = await self.collection.replace_one({"id": id}, task)
