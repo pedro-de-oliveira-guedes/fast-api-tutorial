@@ -1,5 +1,9 @@
 from pydantic import BaseModel
 
+class TaskCreateResponse(BaseModel):
+    id: str
+
+
 class TaskBase(BaseModel):
     name: str
     description: str
